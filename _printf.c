@@ -4,32 +4,35 @@
  * _printf - prints according to format
  * @format: format string
  *
- * Return: number of chars printed
+ * Return: number of chars printed, -1 if NULL format
  */
 int _printf(const char *format, ...)
 {
 	va_list args;
 	int count = 0;
-	char c;
 	char *s;
-
-	va_start(args, format);
+	char c;
 
 	if (!format)
 		return (-1);
+
+	va_start(args, format);
 
 	while (*format)
 	{
 		if (*format == '%')
 		{
 			format++;
-			if (*format == 'c')
+			if (!*format) /* end of string after % */
+				break;
+
+			if (*format == 'c') /* char */
 			{
 				c = va_arg(args, int);
 				write(1, &c, 1);
 				count++;
 			}
-			else if (*format == 's')
+			else if (*format == 's') /* string */
 			{
 				s = va_arg(args, char *);
 				if (!s)
@@ -41,10 +44,15 @@ int _printf(const char *format, ...)
 					count++;
 				}
 			}
-			else if (*format == '%')
+			else if (*format == '%') /* literal % */
 			{
 				write(1, "%", 1);
 				count++;
+			}
+			else
+			{
+				/* unknown specifier: ignore and do not print */
+				; 
 			}
 			format++;
 		}
