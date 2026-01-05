@@ -23,16 +23,16 @@ int _printf(const char *format, ...)
 		if (*format == '%')
 		{
 			format++;
-			if (!*format) /* end of string after % */
+			if (!*format)
 				break;
 
-			if (*format == 'c') /* char */
+			if (*format == 'c')
 			{
 				c = va_arg(args, int);
 				write(1, &c, 1);
 				count++;
 			}
-			else if (*format == 's') /* string */
+			else if (*format == 's')
 			{
 				s = va_arg(args, char *);
 				if (!s)
@@ -44,15 +44,10 @@ int _printf(const char *format, ...)
 					count++;
 				}
 			}
-			else if (*format == '%') /* literal % */
+			else if (*format == '%')
 			{
 				write(1, "%", 1);
 				count++;
-			}
-			else
-			{
-				/* unknown specifier: ignore, do not print */
-				;
 			}
 			format++;
 		}
