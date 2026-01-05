@@ -4,7 +4,7 @@
  * _printf - prints according to format
  * @format: format string
  *
- * Return: number of chars printed, -1 if NULL format
+ * Return: number of chars printed, -1 if format is NULL
  */
 int _printf(const char *format, ...)
 {
@@ -51,8 +51,8 @@ int _printf(const char *format, ...)
 			}
 			else
 			{
-				/* unknown specifier: ignore and do not print */
-				; 
+				/* unknown specifier: ignore, do not print */
+				;
 			}
 			format++;
 		}
