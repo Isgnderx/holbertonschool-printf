@@ -1,65 +1,56 @@
 #include "main.h"
 
 /**
- * _printf - prints according to format
+ * _printf - custom printf
  * @format: format string
  *
- * Return: number of chars printed, -1 if format is NULL
+ * Return: number of chars printed, -1 on error
  */
 int _printf(const char *format, ...)
 {
-	va_list args;
-	int count = 0;
-	char *s;
-	char c;
+	va_list ap;
+	pf_buffer_t b;
+	pf_format_t f;
+	const char *p;
 
-	if (!format)
+	if (format == NULL)
 		return (-1);
 
-	va_start(args, format);
+	pf_buf_init(&b);
+	va_start(ap, format);
 
-	while (*format)
+	p = format;
+	while (*p != '\0')
 	{
-		if (*format == '%')
+		if (*p != '%')
 		{
-			format++;
-			if (!*format)
+			if (pf_buf_putc(&b, *p) == -1)
 				break;
+			p++;
+			continue;
+		}
 
-			if (*format == 'c')
-			{
-				c = va_arg(args, int);
-				write(1, &c, 1);
-				count++;
-			}
-			else if (*format == 's')
-			{
-				s = va_arg(args, char *);
-				if (!s)
-					s = "(null)";
-				while (*s)
-				{
-					write(1, s, 1);
-					s++;
-					count++;
-				}
-			}
-			else if (*format == '%')
-			{
-				write(1, "%", 1);
-				count++;
-			}
-			format++;
-		}
-		else
+		p++;
+		if (*p == '\0')
 		{
-			write(1, format, 1);
-			count++;
-			format++;
+			b.err = 1;
+			break;
 		}
+
+		if (pf_parse(&p, &f, &ap) == -1)
+		{
+			b.err = 1;
+			break;
+		}
+
+		if (pf_handle(&b, &f, &ap) == -1)
+			break;
 	}
 
-	va_end(args);
-	return (count);
-}
+	va_end(ap);
 
+	if (pf_buf_flush(&b) == -1 || b.err)
+		return (-1);
+
+	return (b.len);
+}
